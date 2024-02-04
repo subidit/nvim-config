@@ -272,14 +272,29 @@ return {
 It sets `vim.ui.select` to telescope. That means for example that neovim core stuff can fill the telescope picker. Example would be `lua vim.lsp.buf.code_action()`.
 
 
-## Linters & Formatters 
+# Linters & Formatters 
 Usually linters are CLI tools, `null-ls` plugin brings these functionality to neovim LSP. It is archived now so use `none-ls`.
 
 `null_ls.builtins.formatting.stylua,` this integrates stylua functionalities with LSP. We need to install `stylua` from `mason > Formatter`. Install each linter and formatter for all languages (python [black, isort], javascript [eslint_d, prettier] etc) you want to use.
 
+## alpha-nvim
+alpha is a fast and fully programmable greeter for neovim. `startify` theme gives the latest files you used in the dashboard.
 
-## Autocompletion & Snippets
 
+# Autocompletion & Snippets
+1. `nvim-cmp` - completion engine
+2. `LuaSnip` - snippet engine
+3. `cmp_luasnip` - completion source for nvim-cmp
+4. `Friendly Snippets` - Snippets collection for a set of different programming languages.
+5. `cmp-nvim-lsp` - nvim-cmp source for neovim's built-in language server client.
+
+If you're using LuaSnip make sure to use `require("luasnip.loaders.from_vscode").lazy_load()`, and add `friendly-snippets` as a dependency for LuaSnip, otherwise snippets might not be detected. If you don't use `lazy_load()` you might notice a slower startup-time.
+
+
+# Debuggers
+Debug adapter protocol (DAP). Two plugins `nvim-dap` and `nvim-dap-ui`. Features - breakpoints, step over function, step into function, variable tracing.
+
+Also install language specific [Debug Adapter](https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation).
 
 # Packages
 1. Catppuccin
@@ -292,6 +307,14 @@ Usually linters are CLI tools, `null-ls` plugin brings these functionality to ne
 8. nvim-lspconfig
 9. telescope-ui-select.nvim
 10. none-ls.nvim
+11. Dashboard alpha-nvim
+12. nvim-cmp completion engine
+13. LuaSnip snippet engine
+14. cmp_luasnip completion source for nvim-cmp
+15. Friendly Snippets
+16. cmp-nvim-lsp
+17. nvim-dap
+18. nvim-dap-ui
 
 
 # Commands
@@ -312,3 +335,5 @@ Usually linters are CLI tools, `null-ls` plugin brings these functionality to ne
 15. `K` over a function - display documentation of that function
 16. `Ctrl x o` - LSP builtin omni func
 17. `<leader>gf` - formatting with `vim.lsp.buf.format`
+18. `<Leader>dt` - debugging toggle breakpoint
+19. `<Leader>dc` - debugging continue
