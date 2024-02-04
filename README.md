@@ -133,19 +133,182 @@ config.setup({
 })
 ```
 
-# Commands
-1. Record macro - `qq`, to stop `q`
-2. Paste macro - `@q`
-3. `:source %` source this file. 
-4. `:Lazy` - lazy GUI
-5. `:Telescope find_files<cr>` to see if telescope.nvim is installed correctly.
-6. `Ctrl p` - find files by telescope
-7. `<leader>fg` - Live Grep
-8. `:TSUpdate` - update parsers 
-9. `:TSInstall` - install parsers
+## Neo Tree
+File explorer tree. There is neo-tree and nvim-tree. Add neo-tree to local plugins
+
+```lua
+local plugins = {
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+  {
+    'nvim-telescope/telescope.nvim', tag = '0.1.5',
+    dependencies = { 'nvim-lua/plenary.nvim' }
+  },
+  {"nvim-treesitter/nvim-treesitter", build = ":TSUpdate"},
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", 
+      "MunifTanjim/nui.nvim",
+    }
+  }
+}
+```
+Then add key mapping `vim.keymap.set('n', '<C-n>', ':Neotree filesystem reveal left<CR>')`
+
+
+# Structuring Your Plugins
+Every spec file under the "plugins" directory will be loaded automatically by `lazy.nvim`. To split plugin specs in multiple files, create `lua/plugins.lua` which will `return` (instead of `local plugins =`) all plugins list. All plugin specific `setup` could be placed in separate files inside plugins folder, it is not needed to add `require` calls in your main plugin file anymore.
+
+Now `require("lazy").setup("plugins")` in `~/.config/nvim/init.lua` will use the list from `~/.config/nvim/lua/plugins.lua`. Any lua file in `~/.config/nvim/lua/plugins/*.lua` will be automatically merged in the main plugin spec.
+
+
+### File Structure
+```
+nvim/
+├── init.lua
+├── lua/
+    ├── plugins.lua
+    ├── plugins/
+        ├── telescope.lua
+        ├── neo-tree.lua etc. ├
+```
+
+```
+~/.config/nvim
+├── lua
+│   ├── config
+│   │   ├── autocmds.lua
+│   │   ├── keymaps.lua
+│   │   ├── lazy.lua
+│   │   └── options.lua
+│   └── plugins
+│       ├── spec1.lua
+│       ├── **
+│       └── spec2.lua
+└── init.lua
+```
+
+For plugin specific setups we can move those to the `plugins/*.lua` with plugin spec `config`. `config` is executed when the plugin loads. The default implementation will automatically run `require(MAIN).setup(opts)`. 
+
+Move the plugin setup commands within `config = function() ... end`. 
+Put `require("plugin").setup()` inside config function. 
+
+```lua
+return { 
+  "catppuccin/nvim", 
+  config = function() 
+    vim.cmd.colorscheme "catppuccin"
+  end
+}
+```
+To move remaining vim settings from `init.lua` to a new file we can just `require("file-name")`. It should be placed in the `lua` folder like `nvim/lua/file-name.lua`.
+
+
+## Lualine
+Create `lualine.lua` in plugins folder. `return` the following also add `config` if required.
+
+```lua
+return{
+  'nvim-lualine/lualine.nvim',
+  dependencies = { 'nvim-tree/nvim-web-devicons' },
+  config = function 
+    require('lualine').setup({
+      options = {
+        theme = 'dracula'
+      }
+    })
+  end
+}
+```
+
+# LSP
+Language Server Protocol. Allows communication between text editors and language servers in the local machine. Provides language intelligence features like go to definition, code actions, quick fixes, hover documentation etc. 
+
+## Mason
+`mason` is the LSP manager plugin. 
+`mason-lspconfig` closes some gaps that exist between `mason.nvim` and `lspconfig`. `mason-lspcofig` provides `ensure_installed` property.
+`nvim-lspconfig` sets up communication between neovim and language servers. Also provides key bindings.
+
+```lua
+return {
+  "williamboman/mason.nvim",
+  "williamboman/mason-lspconfig.nvim",
+  "neovim/nvim-lspconfig",
+}
+
+-- full lsp-config.lua with setups and configuration
+return {
+  {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = { "lua-ls" }
+      })
+    end
+  },
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      local lspconfig = require("lspconfig")
+      lspconfig.lua_ls.setup({})
+
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+      vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
+    end
+  }
+}
+```
+
+## telescope-ui-select.nvim
+It sets `vim.ui.select` to telescope. That means for example that neovim core stuff can fill the telescope picker. Example would be `lua vim.lsp.buf.code_action()`.
+
+
+## Linters & Formatters 
+Usually linters are CLI tools, `null-ls` plugin brings these functionality to neovim LSP. It is archived now so use `none-ls`.
+
+`null_ls.builtins.formatting.stylua,` this integrates stylua functionalities with LSP. We need to install `stylua` from `mason > Formatter`. Install each linter and formatter for all languages (python [black, isort], javascript [eslint_d, prettier] etc) you want to use.
+
+
+## Autocompletion & Snippets
 
 
 # Packages
 1. Catppuccin
 2. Telescope
 3. Treesitter
+4. Neotree
+5. Lualine
+6. Mason
+7. mason-lspconfig.nvim
+8. nvim-lspconfig
+9. telescope-ui-select.nvim
+10. none-ls.nvim
+
+
+# Commands
+1. Record macro - `qq`, to stop `q`
+2. Paste macro - `@q`
+3. `\` - search
+4. `:source %` source this file. 
+5. `:Lazy` - lazy GUI
+6. `:Telescope find_files<cr>` to see if telescope.nvim is installed correctly.
+7. `Ctrl p` - find files by telescope
+8. `<leader>fg` - Live Grep
+9. `:TSUpdate` - update parsers 
+10. `:TSInstall` - install parsers
+11. `:Neotree` - Press ? in the Neo-tree window to view the list of mappings.
+12. `Ctrl n` - reveal file tree
+13. `:LspInfo` - by nvim-lspconfig, shows LSPs connected to current buffer
+14. `:h vim.lsp.buf` - help doc showing all available functions in vim.lsp.buf module
+15. `K` over a function - display documentation of that function
+16. `Ctrl x o` - LSP builtin omni func
+17. `<leader>gf` - formatting with `vim.lsp.buf.format`
