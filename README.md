@@ -2,9 +2,9 @@
 - [Neo-vim configuration](#neo-vim-configuration)
   - [Installing neovim](#installing-neovim)
   - [init.lua](#initlua)
-- [NVIM\_APPNAME](#nvim_appname)
-  - [Package Manager](#package-manager)
-    - [lazy.nvim](#lazynvim)
+  - [NVIM\_APPNAME](#nvim_appname)
+- [Package Manager](#package-manager)
+  - [lazy.nvim](#lazynvim)
   - [Colorscheme](#colorscheme)
   - [Telescope](#telescope)
   - [Treesitter](#treesitter)
@@ -40,7 +40,7 @@ Nvim supports using `init.vim` or `init.lua` as the configuration file, but not 
 The `runtimepath` of nvim expects this file to be in `~/.config/nvim/init.lua` in Mac or Linux and for Windows in `~/AppData/Local/nvim/init.lua`.
 
 
-# NVIM_APPNAME
+## NVIM_APPNAME
 The standard directories can be further configured by the `$NVIM_APPNAME` [environment variable](https://neovim.io/doc/user/starting.html#%24NVIM_APPNAME). This variable controls the sub-directory that Nvim will read from (and auto-create) in each of the base directories. For example, setting `$NVIM_APPNAME` to "foo" before starting will cause Nvim to look for configuration files in `$XDG_CONFIG_HOME/foo` instead of `$XDG_CONFIG_HOME/nvim`. `$NVIM_APPNAME` must be a name, such as "foo", or a relative path, such as "foo/bar".
 
 
@@ -62,11 +62,11 @@ vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 ```
 
-## Package Manager 
+# Package Manager 
 1. packer.nvim
 2. lazy.nvim
 
-### lazy.nvim
+## lazy.nvim
 Instructions at [GitHub](https://github.com/folke/lazy.nvim?tab=readme-ov-file#-installation).
 You can add the following Lua code to your init.lua to bootstrap lazy.nvim:
 
